@@ -1,0 +1,183 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'A CloudFormation Stack to create S3 bucket, EC2 Instance Bootstrapped with Jenkins and Security group'
+
+Parameters:
+  BucketName:
+    Description: 'Name of the S3 bucket, which must be globally unique'
+    Type: String
+
+  EncryptionType:
+    Description: 'Encryption type for the S3 bucket (SSE-S3 or KMS)'
+    Type: String
+    Default: SSE-S3
+    AllowedValues:
+      - SSE-S3
+      - KMS
+
+  KMSKeyID:
+    Description: 'KMS Key ID for the S3 bucket (only used if EncryptionType is KMS)'
+    Type: String
+
+  InstanceType:
+    Description: 'EC2 instance type'
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+
+  InstanceName:
+    Description: 'Name for the EC2 instance'
+    Type: String
+    Default: JenkinsInstance
+
+  KeyName:
+    Description: 'Key pair for SSH access'
+    Type: String
+
+Conditions:
+  IsSSES3:
+    !Equals [!Ref EncryptionType, SSE-S3]
+  IsKMS:
+    !Equals [!Ref EncryptionType, KMS]
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-053b0d53c279acc90
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: !If [IsSSES3, AES256, aws:kms]
+              KMSMasterKeyID: !If [IsKMS, !Ref KMSKeyID, !Ref 'AWS::NoValue']
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select [0, !GetAZs 'us-east-1']
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs 'us-east-1']
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [RegionMap, 'us-east-1', AMI]
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: !Ref InstanceName
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !Ref PublicSubnet
+          GroupSet: 
+            - !Ref MySecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt-get update
+          sudo apt install openjdk-11-jdk openjdk-11-jre -y
+          sudo apt-get update
+          curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+            /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+          echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+            https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+            /etc/apt/sources.list.d/jenkins.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install jenkins -y
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for the EC2 instance to allow Jenkins port
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+        - CidrIp: 0.0.0.0/0
+          FromPort: 8080
+          ToPort: 8080
+          IpProtocol: tcp
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+
+Outputs:
+  InstanceId:
+    Description: 'ID of the created EC2 instance'
+    Value: !Ref EC2Instance
+  PublicDns:
+    Description: 'Public DNS of the created EC2 instance'
+    Value: !GetAtt EC2Instance.PublicDnsName
+  PublicIP:
+    Description: 'Public IP of the created EC2 instance'
+    Value: !GetAtt EC2Instance.PublicIp
+  SecurityGroupId:
+    Description: ID of the created security group
+    Value: !Ref MySecurityGroup
+  S3Bucket:
+    Description: 'S3 bucket created using this template'
+    Value: !Ref S3Bucket

@@ -44,16 +44,7 @@ An S3 bucket is created with the specified name (`BucketName` parameter) and enc
 
 ### VPC
 
-**A Virtual Private Cloud (VPC)** is created with a CIDR block of `10.0.0.0/16`. The VPC enables DNS support and hostnames. 
-**Internet Gateway** - An internet gateway is created, which allows the VPC to communicate with the internet.
-**VPC Gateway Attachment** - The VPC gateway attachment associates the VPC with the internet gateway.
-**Public Subnet** - A public subnet is created within the VPC with a CIDR block of `10.0.0.0/24`. The subnet is associated with the first availability zone in the specified AWS region. 
-**Private Subnet** - A private subnet is created within the VPC with a CIDR block of `10.0.1.0/24`. The subnet is associated with the first availability zone in the specified AWS region.
-**Public Route Table** - A public route table is created and associated with the VPC.
-**Public Route** - A route is added to the public route table, allowing traffic to the internet gateway.
-**Public Subnet Route Table Association** - The public subnet is associated with the public route table.
-**Private Route Table** - A private route table is created and associated with the VPC.
-**Private Subnet Route Table Association** - The private subnet is associated with the private route table.
+A VPC is created with a CIDR block of 10.0.0.0/16. It has DNS support and hostnames enabled. An internet gateway is added to allow VPC communication with the internet. The VPC is associated with the internet gateway using a gateway attachment. Additionally, a public subnet (10.0.0.0/24) and a private subnet (10.0.1.0/24) are created within the VPC, each associated with the first availability zone in the specified AWS region. Public and private route tables are created and linked to the VPC. The public route table allows traffic to the internet gateway, while the public subnet is associated with it. Similarly, the private subnet is associated with the private route table.
 
 ### EC2 Instance (Jenkins)
 

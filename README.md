@@ -44,7 +44,7 @@ An S3 bucket is created with the specified name (`BucketName` parameter) and enc
 
 ### VPC
 
-A Virtual Private Cloud (VPC) is created with a CIDR block of `10.0.0.0/16`. The VPC enables DNS support and hostnames. 
+**A Virtual Private Cloud (VPC)** is created with a CIDR block of `10.0.0.0/16`. The VPC enables DNS support and hostnames. 
 **Internet Gateway** - An internet gateway is created, which allows the VPC to communicate with the internet.
 **VPC Gateway Attachment** - The VPC gateway attachment associates the VPC with the internet gateway.
 **Public Subnet** - A public subnet is created within the VPC with a CIDR block of `10.0.0.0/24`. The subnet is associated with the first availability zone in the specified AWS region. 

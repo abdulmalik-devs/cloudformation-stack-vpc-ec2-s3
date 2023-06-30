@@ -77,7 +77,6 @@ ParameterKey=KMSKeyID,ParameterValue=cloudsecID \
 ParameterKey=InstanceType,ParameterValue=t2.micro \
 ParameterKey=InstanceName,ParameterValue=CloudSec-Instance \
 ParameterKey=KeyName,ParameterValue=word
-'''
 
 **To execute the command, follow these steps:**
 
@@ -95,7 +94,6 @@ To delete the CloudFormation stack and associated resources:
 
 '''shell
 aws cloudformation delete-stack --stack-name DevSec
-'''
 
 ## Conclusion
 

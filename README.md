@@ -4,6 +4,17 @@
 
 This CloudFormation stack creates an AWS infrastructure that includes an S3 bucket, VPC, an EC2 instance bootstrapped with Jenkins, and a security group. The stack provides an easy and automated way to set up a development environment for continuous integration and delivery.
 
+## Outputs
+
+**EC2 Instance Running Jenkins**
+
+![Screenshot from 2023-06-30 23-32-05](https://github.com/abdulmalik-devs/cloudformation-stack-vpc-ec2-s3/assets/62616273/18c281ca-b8f2-43fe-9f7a-00da4ababb7e)
+
+**AWS CloudFormation Dashboard**
+
+![Screenshot from 2023-06-30 23-32-30](https://github.com/abdulmalik-devs/cloudformation-stack-vpc-ec2-s3/assets/62616273/b5e0382c-3bf6-42d4-bf32-756675b4a12e)
+
+
 ## Prerequisites
 
 Before launching the CloudFormation stack, ensure that you have the following:
@@ -25,7 +36,7 @@ The CloudFormation stack accept input from the user using the following paramete
 
 ## Resources
 
-The CloudFormation stack creates the following resources:
+**The CloudFormation stack creates the following resources:**
 
 ### S3 Bucket
 
@@ -33,7 +44,16 @@ An S3 bucket is created with the specified name (`BucketName` parameter) and enc
 
 ### VPC
 
-A Virtual Private Cloud (VPC) is created with a CIDR block of `10.0.0.0/16`. The VPC enables DNS support and hostnames. **Internet Gateway** - An internet gateway is created, which allows the VPC to communicate with the internet. **VPC Gateway Attachment** - The VPC gateway attachment associates the VPC with the internet gateway. **Public Subnet** - A public subnet is created within the VPC with a CIDR block of `10.0.0.0/24`. The subnet is associated with the first availability zone in the specified AWS region. **Private Subnet** - A private subnet is created within the VPC with a CIDR block of `10.0.1.0/24`. The subnet is associated with the first availability zone in the specified AWS region. **Public Route Table** - A public route table is created and associated with the VPC. **Public Route** - A route is added to the public route table, allowing traffic to the internet gateway. **Public Subnet Route Table Association** - The public subnet is associated with the public route table. **Private Route Table** - A private route table is created and associated with the VPC. **Private Subnet Route Table Association** - The private subnet is associated with the private route table.
+A Virtual Private Cloud (VPC) is created with a CIDR block of `10.0.0.0/16`. The VPC enables DNS support and hostnames. 
+**Internet Gateway** - An internet gateway is created, which allows the VPC to communicate with the internet.
+**VPC Gateway Attachment** - The VPC gateway attachment associates the VPC with the internet gateway.
+**Public Subnet** - A public subnet is created within the VPC with a CIDR block of `10.0.0.0/24`. The subnet is associated with the first availability zone in the specified AWS region. 
+**Private Subnet** - A private subnet is created within the VPC with a CIDR block of `10.0.1.0/24`. The subnet is associated with the first availability zone in the specified AWS region.
+**Public Route Table** - A public route table is created and associated with the VPC.
+**Public Route** - A route is added to the public route table, allowing traffic to the internet gateway.
+**Public Subnet Route Table Association** - The public subnet is associated with the public route table.
+**Private Route Table** - A private route table is created and associated with the VPC.
+**Private Subnet Route Table Association** - The private subnet is associated with the private route table.
 
 ### EC2 Instance (Jenkins)
 
@@ -100,3 +120,7 @@ aws cloudformation delete-stack --stack-name DevSec
 ## Conclusion
 
 This CloudFormation stack simplifies the setup of an S3 bucket, an EC2 instance with Jenkins, and a security group, providing an automated and reproducible way to create the required infrastructure for continuous integration and delivery. Feel free to customize the parameters and resources according to your specific needs.
+
+## Author
+
+* [AbduMalik Ololade](https://github.com/abdulmalik-devs)

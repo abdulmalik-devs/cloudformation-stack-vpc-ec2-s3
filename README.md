@@ -57,9 +57,9 @@ The CloudFormation stack provides the following outputs:
 
 - **To Validate your Template Stack**
 
-  '''shell
-  aws cloudformation validate-template --template-body file://s3.yaml
-  '''
+```shell
+aws cloudformation validate-template --template-body file://s3.yaml
+```
 
 - **To launch the CloudFormation stack:**
 
@@ -77,6 +77,7 @@ ParameterKey=KMSKeyID,ParameterValue=cloudsecID \
 ParameterKey=InstanceType,ParameterValue=t2.micro \
 ParameterKey=InstanceName,ParameterValue=CloudSec-Instance \
 ParameterKey=KeyName,ParameterValue=word
+``` 
 
 **To execute the command, follow these steps:**
 
@@ -92,8 +93,9 @@ ParameterKey=KeyName,ParameterValue=word
 
 To delete the CloudFormation stack and associated resources:
 
-'''shell
+```shell
 aws cloudformation delete-stack --stack-name DevSec
+```
 
 ## Conclusion
 

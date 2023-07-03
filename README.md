@@ -4,6 +4,10 @@
 
 This CloudFormation stack creates an AWS infrastructure that includes an S3 bucket, VPC, an EC2 instance bootstrapped with Jenkins, and a security group. The stack provides an easy and automated way to set up a development environment for continuous integration and delivery.
 
+## Project Architecture
+
+![CF](https://github.com/abdulmalik-devs/cloudformation-stack-vpc-ec2-s3/assets/62616273/c8bdd07f-d3e6-4ca1-a9f3-ae21522e4674)
+
 ## Outputs
 
 **EC2 Instance Running Jenkins**
